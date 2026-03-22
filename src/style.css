@@ -753,6 +753,16 @@ piece.ghost { opacity: 0.3 !important; }
 
 .panel-acts { display: flex; gap: 4px; margin-top: auto; position: relative; z-index: 1; }
 
+.confirm-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; margin-top: 6px;
+  background: rgba(18,18,22,0.92); border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: .85rem; color: var(--text);
+}
+.confirm-bar span { flex: 1; }
+.confirm-bar.hide { display: none; }
+
 /* ===== OVERLAYS (promotion only) ===== */
 .ov {
   position: fixed; inset: 0; z-index: 100;

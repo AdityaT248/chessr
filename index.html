@@ -233,7 +233,20 @@
         </div>
         <div class="panel-acts">
           <button class="glass-sm-btn" id="btn-flip">Flip</button>
+          <button class="glass-sm-btn" id="btn-draw">Draw</button>
           <button class="glass-sm-btn red" id="btn-resign">Resign</button>
+        </div>
+        <!-- Confirm dialog -->
+        <div class="confirm-bar hide" id="confirm-bar">
+          <span id="confirm-msg">Resign?</span>
+          <button class="glass-sm-btn red" id="confirm-yes">Yes</button>
+          <button class="glass-sm-btn" id="confirm-no">No</button>
+        </div>
+        <!-- Draw offer received -->
+        <div class="confirm-bar hide" id="draw-offer-bar">
+          <span>Opponent offers a draw</span>
+          <button class="glass-sm-btn" id="draw-accept">Accept</button>
+          <button class="glass-sm-btn red" id="draw-decline">Decline</button>
         </div>
       </aside>
     </div>

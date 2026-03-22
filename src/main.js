@@ -108,8 +108,10 @@ function showScreen(id) {
     if (id === 'game') { vid.classList.add('vid-hidden'); vid.pause(); }
     else { vid.classList.remove('vid-hidden'); vid.play().catch(() => {}); }
   }
-  // Close any game-end banner when leaving game
+  // Close any game-end banner and confirm dialogs when leaving game
   if (id !== 'game') $endBanner.classList.add('hide');
+  document.getElementById('confirm-bar')?.classList.add('hide');
+  document.getElementById('draw-offer-bar')?.classList.add('hide');
   // Resize board when switching to game
   if (id === 'game' && ground) {
     requestAnimationFrame(() => { resizeBoard(); ground.redrawAll(); });
@@ -469,6 +471,8 @@ function startGame() {
   gameOver = false; pendingPremove = null;
   $endBanner.classList.add('hide');
   $ovPromo.classList.remove('open');
+  $('confirm-bar').classList.add('hide');
+  $('draw-offer-bar').classList.add('hide');
 
   const [ms, inc] = parseTC(chosenTC);
   if (ms === 0) {
@@ -536,6 +540,14 @@ function initSocket() {
   });
   socket.on('opponent-resigned', () => endGame('Opponent resigned'));
   socket.on('opponent-disconnected', () => { toast('Opponent disconnected', true); endGame('Opponent left'); });
+  socket.on('draw-offered', () => {
+    $('draw-offer-bar').classList.remove('hide');
+  });
+  socket.on('draw-accepted', () => endGame('Draw by agreement'));
+  socket.on('rematch-offer', ({ gameId, color, tc }) => {
+    onlineGameId = gameId; onlineColor = color; orientation = color;
+    chosenTC = tc; startGame();
+  });
   socket.on('error-msg', ({ message }) => toast(message, true));
 }
 
@@ -621,16 +633,66 @@ $endBanner.addEventListener('click', (e) => {
 
 // Game
 $('btn-new-game').addEventListener('click', () => { clearInterval(timerInterval); $endBanner.classList.add('hide'); navigate(mode === 'ai' ? '/play/computer' : '/'); });
-$('btn-ov-new').addEventListener('click', () => { $endBanner.classList.add('hide'); if (mode === 'ai') startGame(); else navigate('/'); });
+$('btn-ov-new').addEventListener('click', () => {
+  $endBanner.classList.add('hide');
+  if (mode === 'ai') {
+    startGame();
+  } else if (mode === 'online') {
+    navigate('/play/online');
+  } else {
+    navigate('/play/friend');
+  }
+});
 $('btn-flip').addEventListener('click', () => {
   orientation = orientation === 'white' ? 'black' : 'white';
   ground.set({ orientation }); updateNames(); updateBars();
   if (timeWhite > 0) updateClocks();
 });
+// ─── Confirm dialog helper ───
+let confirmAction = null;
+function showConfirm(msg, action) {
+  $('confirm-msg').textContent = msg;
+  confirmAction = action;
+  $('confirm-bar').classList.remove('hide');
+}
+function hideConfirm() {
+  $('confirm-bar').classList.add('hide');
+  confirmAction = null;
+}
+$('confirm-yes').addEventListener('click', () => { if (confirmAction) confirmAction(); hideConfirm(); });
+$('confirm-no').addEventListener('click', hideConfirm);
+
+// Resign with confirmation
 $('btn-resign').addEventListener('click', () => {
   if (gameOver) return;
-  if (mode === 'online' && onlineGameId) socket.emit('resign', { gameId: onlineGameId });
-  endGame('You resigned');
+  showConfirm('Resign this game?', () => {
+    if (mode === 'online' && onlineGameId) socket.emit('resign', { gameId: onlineGameId });
+    endGame('You resigned');
+  });
+});
+
+// Draw offer with confirmation
+$('btn-draw').addEventListener('click', () => {
+  if (gameOver) return;
+  if (mode === 'ai') {
+    showConfirm('Offer draw to engine?', () => endGame('Draw by agreement'));
+  } else if (mode === 'online' && onlineGameId) {
+    showConfirm('Offer a draw?', () => {
+      socket.emit('offer-draw', { gameId: onlineGameId });
+      toast('Draw offer sent');
+    });
+  }
+});
+
+// Draw offer received buttons
+$('draw-accept').addEventListener('click', () => {
+  $('draw-offer-bar').classList.add('hide');
+  if (onlineGameId) socket.emit('accept-draw', { gameId: onlineGameId });
+  endGame('Draw by agreement');
+});
+$('draw-decline').addEventListener('click', () => {
+  $('draw-offer-bar').classList.add('hide');
+  toast('Draw declined');
 });
 
 // Move nav
