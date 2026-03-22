@@ -500,7 +500,8 @@ function startGame() {
 // ─── Socket.IO ───
 function initSocket() {
   if (socket) return;
-  socket = io();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || undefined;
+  socket = io(backendUrl);
   socket.on('queue-joined', () => {});
   socket.on('game-matched', ({ gameId, color, tc }) => {
     onlineGameId = gameId; onlineColor = color; orientation = color;
