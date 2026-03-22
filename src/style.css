@@ -764,6 +764,9 @@ piece.ghost { opacity: 0.3 !important; }
 .confirm-bar span { flex: 1; }
 .confirm-bar.hide { display: none; }
 
+.panel-post { display: flex; gap: 6px; margin-top: 8px; }
+.panel-post.hide { display: none; }
+
 /* ===== REMATCH POPUP ===== */
 .rematch-popup {
   position: fixed; bottom: 24px; right: 24px; z-index: 200;
