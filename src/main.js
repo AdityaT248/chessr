@@ -112,6 +112,7 @@ function showScreen(id) {
   if (id !== 'game') $endBanner.classList.add('hide');
   document.getElementById('confirm-bar')?.classList.add('hide');
   document.getElementById('draw-offer-bar')?.classList.add('hide');
+  document.getElementById('rematch-popup')?.classList.add('hide');
   // Resize board when switching to game
   if (id === 'game' && ground) {
     requestAnimationFrame(() => { resizeBoard(); ground.redrawAll(); });
@@ -551,26 +552,26 @@ function initSocket() {
   });
   socket.on('draw-accepted', () => endGame('Draw by agreement'));
   socket.on('rematch-offered', () => {
-    $('rematch-status').textContent = 'Opponent wants a rematch!';
-    $('rematch-status').classList.remove('hide');
-    $('btn-ov-rematch').disabled = false;
-    $('btn-ov-rematch').textContent = 'Accept Rematch';
+    $('rematch-popup-msg').textContent = 'Opponent wants a rematch';
+    $('rematch-popup').classList.remove('hide');
   });
   socket.on('rematch-start', ({ gameId, color, tc }) => {
     onlineGameId = gameId; onlineColor = color; orientation = color;
     chosenTC = tc; mode = 'online';
+    $('rematch-popup').classList.add('hide');
     $('btn-ov-rematch').disabled = false;
     $('btn-ov-rematch').textContent = 'Rematch';
     startGame();
   });
   socket.on('rematch-declined', () => {
     $('rematch-status').textContent = 'Rematch declined';
+    $('rematch-status').classList.remove('hide');
     $('btn-ov-rematch').disabled = false;
     $('btn-ov-rematch').textContent = 'Rematch';
   });
   socket.on('rematch-cancelled', () => {
-    $('rematch-status').textContent = 'Rematch cancelled';
-    $('rematch-status').classList.remove('hide');
+    $('rematch-popup').classList.add('hide');
+    toast('Rematch cancelled');
   });
   socket.on('error-msg', ({ message }) => toast(message, true));
 }
@@ -667,7 +668,7 @@ $('btn-ov-new').addEventListener('click', () => {
     navigate('/play/friend');
   }
 });
-// Rematch
+// Rematch (banner button)
 $('btn-ov-rematch').addEventListener('click', () => {
   if (!onlineGameId || !socket) return;
   socket.emit('offer-rematch', { gameId: onlineGameId });
@@ -675,6 +676,16 @@ $('btn-ov-rematch').addEventListener('click', () => {
   $('btn-ov-rematch').textContent = 'Rematch sent';
   $('rematch-status').textContent = 'Waiting for opponent...';
   $('rematch-status').classList.remove('hide');
+});
+
+// Rematch popup (bottom-right, from opponent)
+$('rematch-popup-accept').addEventListener('click', () => {
+  $('rematch-popup').classList.add('hide');
+  if (onlineGameId && socket) socket.emit('offer-rematch', { gameId: onlineGameId });
+});
+$('rematch-popup-decline').addEventListener('click', () => {
+  $('rematch-popup').classList.add('hide');
+  if (onlineGameId && socket) socket.emit('decline-rematch', { gameId: onlineGameId });
 });
 
 $('btn-flip').addEventListener('click', () => {

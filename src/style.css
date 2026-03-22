@@ -764,6 +764,30 @@ piece.ghost { opacity: 0.3 !important; }
 .confirm-bar span { flex: 1; }
 .confirm-bar.hide { display: none; }
 
+/* ===== REMATCH POPUP ===== */
+.rematch-popup {
+  position: fixed; bottom: 24px; right: 24px; z-index: 200;
+  background: rgba(16,16,20,0.96);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 220px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  animation: rematch-in 0.2s ease-out;
+}
+.rematch-popup.hide { display: none; }
+.rematch-popup-msg {
+  font-size: .88rem; font-weight: 600; color: var(--text-hi);
+  margin: 0 0 12px 0;
+}
+.rematch-popup-btns { display: flex; gap: 8px; }
+@keyframes rematch-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ===== OVERLAYS (promotion only) ===== */
 .ov {
   position: fixed; inset: 0; z-index: 100;
