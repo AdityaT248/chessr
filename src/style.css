@@ -600,6 +600,7 @@ html, body {
 }
 .geb-inner p { font-size: .72rem; color: var(--text-lo); margin-bottom: 14px; }
 .geb-inner .ov-btns { display: flex; gap: 8px; justify-content: center; }
+.rematch-status { font-size: .72rem; color: var(--text-lo); margin-top: 8px; margin-bottom: 0; }
 
 /* ===== CHESSGROUND ===== */
 cg-board {

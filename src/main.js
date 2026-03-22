@@ -357,6 +357,12 @@ function endGame(msg) {
   $ovMsg.textContent = '';
   $endBanner.classList.remove('hide');
   ground.set({ movable: { color: undefined }, premovable: { enabled: false } });
+  // Show rematch for online/friend, play again for AI
+  const isMultiplayer = mode === 'online' && onlineGameId;
+  $('btn-ov-new').classList.toggle('hide', isMultiplayer);
+  $('btn-ov-rematch').classList.toggle('hide', !isMultiplayer);
+  $('rematch-status').classList.add('hide');
+  $('rematch-status').textContent = '';
   saveGameState();
 }
 
@@ -544,9 +550,27 @@ function initSocket() {
     $('draw-offer-bar').classList.remove('hide');
   });
   socket.on('draw-accepted', () => endGame('Draw by agreement'));
-  socket.on('rematch-offer', ({ gameId, color, tc }) => {
+  socket.on('rematch-offered', () => {
+    $('rematch-status').textContent = 'Opponent wants a rematch!';
+    $('rematch-status').classList.remove('hide');
+    $('btn-ov-rematch').disabled = false;
+    $('btn-ov-rematch').textContent = 'Accept Rematch';
+  });
+  socket.on('rematch-start', ({ gameId, color, tc }) => {
     onlineGameId = gameId; onlineColor = color; orientation = color;
-    chosenTC = tc; startGame();
+    chosenTC = tc; mode = 'online';
+    $('btn-ov-rematch').disabled = false;
+    $('btn-ov-rematch').textContent = 'Rematch';
+    startGame();
+  });
+  socket.on('rematch-declined', () => {
+    $('rematch-status').textContent = 'Rematch declined';
+    $('btn-ov-rematch').disabled = false;
+    $('btn-ov-rematch').textContent = 'Rematch';
+  });
+  socket.on('rematch-cancelled', () => {
+    $('rematch-status').textContent = 'Rematch cancelled';
+    $('rematch-status').classList.remove('hide');
   });
   socket.on('error-msg', ({ message }) => toast(message, true));
 }
@@ -643,6 +667,16 @@ $('btn-ov-new').addEventListener('click', () => {
     navigate('/play/friend');
   }
 });
+// Rematch
+$('btn-ov-rematch').addEventListener('click', () => {
+  if (!onlineGameId || !socket) return;
+  socket.emit('offer-rematch', { gameId: onlineGameId });
+  $('btn-ov-rematch').disabled = true;
+  $('btn-ov-rematch').textContent = 'Rematch sent';
+  $('rematch-status').textContent = 'Waiting for opponent...';
+  $('rematch-status').classList.remove('hide');
+});
+
 $('btn-flip').addEventListener('click', () => {
   orientation = orientation === 'white' ? 'black' : 'white';
   ground.set({ orientation }); updateNames(); updateBars();

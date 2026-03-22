@@ -99,6 +99,49 @@ io.on('connection', (socket) => {
   socket.on('offer-draw', ({ gameId }) => socket.to(gameId).emit('draw-offered'));
   socket.on('accept-draw', ({ gameId }) => socket.to(gameId).emit('draw-accepted'));
 
+  // ── Rematch ──
+  socket.on('offer-rematch', ({ gameId }) => {
+    const g = games.get(gameId);
+    if (!g) return;
+    if (!g.rematchFrom) {
+      g.rematchFrom = socket.id;
+      socket.to(gameId).emit('rematch-offered');
+    } else if (g.rematchFrom !== socket.id) {
+      // Both agreed — create new game with swapped colors
+      const oldWhiteId = g.players.white;
+      const oldBlackId = g.players.black;
+      const newId = genId();
+      const newGame = {
+        id: newId,
+        players: { white: oldBlackId, black: oldWhiteId },
+        tc: g.tc, status: 'active', created: Date.now()
+      };
+      games.set(newId, newGame);
+      // Move both sockets to new room
+      const sockets = io.sockets.sockets;
+      for (const [color, playerId] of Object.entries(newGame.players)) {
+        const s = sockets.get(playerId);
+        if (s) {
+          s.leave(gameId);
+          s.join(newId);
+          s.gameId = newId;
+          s.playerColor = color;
+          s.emit('rematch-start', { gameId: newId, color, tc: g.tc });
+        }
+      }
+    }
+  });
+
+  socket.on('cancel-rematch', ({ gameId }) => {
+    const g = games.get(gameId);
+    if (g) { delete g.rematchFrom; socket.to(gameId).emit('rematch-cancelled'); }
+  });
+
+  socket.on('decline-rematch', ({ gameId }) => {
+    const g = games.get(gameId);
+    if (g) { delete g.rematchFrom; socket.to(gameId).emit('rematch-declined'); }
+  });
+
   socket.on('disconnect', () => {
     // Remove from queue
     for (const [key, q] of queue) {
