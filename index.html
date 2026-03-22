@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>chessr</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♟</text></svg>">
+</head>
+<body>
+
+  <!-- Global video background (visible on all pages except game) -->
+  <video id="hero-video" src="/hero.mp4" autoplay loop muted playsinline></video>
+
+  <!-- ====== HOME ====== -->
+  <div id="home">
+    <nav class="nav">
+      <span class="brand">chessr</span>
+      <div class="nav-r"></div>
+    </nav>
+    <div class="home-wrap">
+      <div class="home-content">
+        <div class="home-menu">
+          <button class="hm-item anim-fade" id="play-computer">
+            <span class="hm-title">Play Computer</span>
+            <span class="hm-sub">8 difficulty levels</span>
+          </button>
+          <button class="hm-item anim-fade" style="animation-delay:.1s" id="play-online">
+            <span class="hm-title">Play Online</span>
+            <span class="hm-sub">Find an opponent</span>
+          </button>
+          <button class="hm-item anim-fade" style="animation-delay:.2s" id="play-friend">
+            <span class="hm-title">Play a Friend</span>
+            <span class="hm-sub">Share a link</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SETUP: COMPUTER ====== -->
+  <div id="setup-ai" class="screen hide">
+    <nav class="nav">
+      <span class="brand" data-go="home">chessr</span>
+      <div class="nav-r"><button class="nav-btn" data-go="home">Back</button></div>
+    </nav>
+    <div class="setup-wrap">
+      <div class="setup-card">
+        <h2 class="setup-h">Play Computer</h2>
+        <div class="setup-sec">
+          <label class="lbl">Difficulty</label>
+          <div class="diff-grid" id="diff-grid">
+            <button class="g-btn" data-lv="1"><strong>1</strong><small>Beginner</small></button>
+            <button class="g-btn" data-lv="2"><strong>2</strong><small>Novice</small></button>
+            <button class="g-btn sel" data-lv="3"><strong>3</strong><small>Casual</small></button>
+            <button class="g-btn" data-lv="4"><strong>4</strong><small>Club</small></button>
+            <button class="g-btn" data-lv="5"><strong>5</strong><small>Advanced</small></button>
+            <button class="g-btn" data-lv="6"><strong>6</strong><small>Expert</small></button>
+            <button class="g-btn" data-lv="7"><strong>7</strong><small>Master</small></button>
+            <button class="g-btn" data-lv="8"><strong>8</strong><small>Maximum</small></button>
+          </div>
+        </div>
+        <div class="setup-sec">
+          <label class="lbl">Time Control</label>
+          <div class="tc-grid" id="tc-grid-ai">
+            <button class="g-btn" data-tc="1+0"><strong>1+0</strong><small>Bullet</small></button>
+            <button class="g-btn" data-tc="2+1"><strong>2+1</strong><small>Bullet</small></button>
+            <button class="g-btn" data-tc="3+0"><strong>3+0</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="3+2"><strong>3+2</strong><small>Blitz</small></button>
+            <button class="g-btn sel" data-tc="5+0"><strong>5+0</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="5+3"><strong>5+3</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="10+0"><strong>10+0</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="10+5"><strong>10+5</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="15+10"><strong>15+10</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="30+0"><strong>30+0</strong><small>Classical</small></button>
+            <button class="g-btn" data-tc="30+20"><strong>30+20</strong><small>Classical</small></button>
+            <button class="g-btn" data-tc="0+0"><strong>&infin;</strong><small>Unlimited</small></button>
+          </div>
+        </div>
+        <div class="setup-sec">
+          <label class="lbl">Play as</label>
+          <div class="color-row">
+            <button class="g-btn sel" data-c="white">White</button>
+            <button class="g-btn" data-c="random">Random</button>
+            <button class="g-btn" data-c="black">Black</button>
+          </div>
+        </div>
+        <button class="cta-btn" id="btn-start-ai">Play</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SETUP: ONLINE ====== -->
+  <div id="setup-online" class="screen hide">
+    <nav class="nav">
+      <span class="brand" data-go="home">chessr</span>
+      <div class="nav-r"><button class="nav-btn" data-go="home">Back</button></div>
+    </nav>
+    <div class="setup-wrap">
+      <div class="setup-card">
+        <h2 class="setup-h">Play Online</h2>
+        <div class="setup-sec">
+          <label class="lbl">Time Control</label>
+          <div class="tc-grid" id="tc-grid-online">
+            <button class="g-btn" data-tc="1+0"><strong>1+0</strong><small>Bullet</small></button>
+            <button class="g-btn" data-tc="2+1"><strong>2+1</strong><small>Bullet</small></button>
+            <button class="g-btn" data-tc="3+0"><strong>3+0</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="3+2"><strong>3+2</strong><small>Blitz</small></button>
+            <button class="g-btn sel" data-tc="5+0"><strong>5+0</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="5+3"><strong>5+3</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="10+0"><strong>10+0</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="10+5"><strong>10+5</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="15+10"><strong>15+10</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="30+0"><strong>30+0</strong><small>Classical</small></button>
+          </div>
+        </div>
+        <button class="cta-btn" id="btn-find-game">Find Opponent</button>
+        <div class="searching-box hide" id="searching-box">
+          <div class="spinner"></div>
+          <p class="search-text">Searching for opponent...</p>
+          <button class="link-btn" id="btn-cancel-search">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SETUP: FRIEND ====== -->
+  <div id="setup-friend" class="screen hide">
+    <nav class="nav">
+      <span class="brand" data-go="home">chessr</span>
+      <div class="nav-r"><button class="nav-btn" data-go="home">Back</button></div>
+    </nav>
+    <div class="setup-wrap">
+      <div class="setup-card">
+        <h2 class="setup-h">Play a Friend</h2>
+        <div class="setup-sec">
+          <label class="lbl">Time Control</label>
+          <div class="tc-grid" id="tc-grid-friend">
+            <button class="g-btn" data-tc="1+0"><strong>1+0</strong><small>Bullet</small></button>
+            <button class="g-btn" data-tc="3+0"><strong>3+0</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="3+2"><strong>3+2</strong><small>Blitz</small></button>
+            <button class="g-btn sel" data-tc="5+0"><strong>5+0</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="5+3"><strong>5+3</strong><small>Blitz</small></button>
+            <button class="g-btn" data-tc="10+0"><strong>10+0</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="10+5"><strong>10+5</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="15+10"><strong>15+10</strong><small>Rapid</small></button>
+            <button class="g-btn" data-tc="0+0"><strong>&infin;</strong><small>Unlimited</small></button>
+          </div>
+        </div>
+        <div class="friend-actions" id="friend-actions">
+          <button class="cta-btn" id="btn-create-game">Create Game</button>
+          <div class="divider"><span>or join</span></div>
+          <div class="join-row">
+            <input id="join-inp" class="glass-input" placeholder="Game code" maxlength="6" spellcheck="false" autocomplete="off">
+            <button class="cta-btn cta-sm" id="btn-join-game">Join</button>
+          </div>
+        </div>
+        <div class="wait-card hide" id="wait-card">
+          <div class="spinner"></div>
+          <p class="wait-text">Waiting for opponent</p>
+          <div class="code-display">
+            <span class="code-label">Game Code</span>
+            <span class="code-value" id="share-code">------</span>
+          </div>
+          <div class="link-display">
+            <span class="code-label">Share Link</span>
+            <input class="glass-input link-input" id="share-link" readonly>
+          </div>
+          <div class="wait-actions">
+            <button class="glass-sm-btn" id="btn-copy-code">Copy Code</button>
+            <button class="glass-sm-btn" id="btn-copy-link">Copy Link</button>
+          </div>
+          <button class="link-btn red" id="btn-cancel-wait">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== GAME ====== -->
+  <div id="game" class="screen hide">
+    <nav class="nav">
+      <span class="brand" data-go="home">chessr</span>
+      <div class="nav-r"><button class="nav-btn" id="btn-new-game">New Game</button></div>
+    </nav>
+    <div id="game-layout">
+      <main id="main">
+        <div class="pbar" id="top-bar">
+          <div class="pbar-l"><span class="pdot" id="top-dot"></span><span class="pname" id="top-name">Stockfish</span></div>
+          <div class="pclock" id="top-cw"><span id="top-clk">5:00</span></div>
+        </div>
+        <div id="board-wrap"><div id="board"></div></div>
+        <div class="pbar" id="bot-bar">
+          <div class="pbar-l"><span class="pdot on" id="bot-dot"></span><span class="pname" id="bot-name">You</span></div>
+          <div class="pclock" id="bot-cw"><span id="bot-clk">5:00</span></div>
+        </div>
+        <!-- Game-over banner (inside game area, not full-screen) -->
+        <div class="game-end-banner hide" id="game-end-banner">
+          <div class="geb-inner">
+            <h2 id="ov-title">Checkmate</h2>
+            <p id="ov-msg">White wins</p>
+            <div class="ov-btns">
+              <button class="cta-btn cta-sm" id="btn-ov-new">Play Again</button>
+              <button class="glass-sm-btn" id="btn-ov-home" data-go="home">Home</button>
+            </div>
+          </div>
+        </div>
+      </main>
+      <aside id="panel">
+        <div class="sec-moves"><div id="movelist"></div></div>
+        <div class="mnav">
+          <button class="nb" id="mn-start">⟨⟨</button>
+          <button class="nb" id="mn-back">‹</button>
+          <button class="nb" id="mn-fwd">›</button>
+          <button class="nb" id="mn-end">⟩⟩</button>
+        </div>
+        <div class="panel-acts">
+          <button class="glass-sm-btn" id="btn-flip">Flip</button>
+          <button class="glass-sm-btn red" id="btn-resign">Resign</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ====== OVERLAYS (promotion only) ====== -->
+  <div class="ov" id="ov-promo">
+    <div class="ov-box ov-promo-box"><div id="promo-opts"></div></div>
+  </div>
+  <div id="toasts"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

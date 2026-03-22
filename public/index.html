@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>MONARCH</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♔</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessground@9.1.1/assets/chessground.base.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="ambient">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+  </div>
+
+  <div class="app">
+    <!-- NAV -->
+    <nav class="nav glass">
+      <div class="brand">♔ <span>MONARCH</span></div>
+      <div class="tabs">
+        <button class="tab on" data-m="ai">vs Computer</button>
+        <button class="tab" data-m="local">Local</button>
+        <button class="tab" data-m="online">Online</button>
+        <button class="tab" data-m="lichess">Lichess</button>
+      </div>
+      <button class="btn-new" onclick="App.newGame()">New Game</button>
+    </nav>
+
+    <!-- BOARD AREA -->
+    <main class="main">
+      <div class="bar glass" id="top-bar">
+        <div class="bar-left">
+          <span class="dot" id="top-dot"></span>
+          <span class="bar-name" id="top-name">Stockfish</span>
+          <span class="bar-captured" id="top-cap"></span>
+          <span class="bar-diff" id="top-diff"></span>
+        </div>
+        <div class="clock-wrap" id="top-cw"><span class="clock" id="top-clk">5:00</span></div>
+      </div>
+
+      <div class="cg-area">
+        <div id="board"></div>
+      </div>
+
+      <div class="bar glass" id="bot-bar">
+        <div class="bar-left">
+          <span class="dot on" id="bot-dot"></span>
+          <span class="bar-name" id="bot-name">You</span>
+          <span class="bar-captured" id="bot-cap"></span>
+          <span class="bar-diff" id="bot-diff"></span>
+        </div>
+        <div class="clock-wrap" id="bot-cw"><span class="clock" id="bot-clk">5:00</span></div>
+      </div>
+    </main>
+
+    <!-- SIDE -->
+    <aside class="side glass">
+      <!-- AI block -->
+      <div class="blk" id="blk-ai">
+        <div class="blk-label">Difficulty</div>
+        <input type="range" class="slider" id="ai-lv" min="1" max="8" value="3">
+        <div class="diff-label" id="diff-lbl">Intermediate</div>
+      </div>
+
+      <!-- Online block (our server) -->
+      <div class="blk hide" id="blk-online">
+        <div id="ol-lobby">
+          <button class="btn gold full" onclick="App.createGame()">Create Game</button>
+          <div class="sep"><span>or join</span></div>
+          <div class="row-join">
+            <input class="inp glass" id="join-inp" placeholder="Code" maxlength="6" spellcheck="false">
+            <button class="btn gold" onclick="App.joinByCode()">Join</button>
+          </div>
+        </div>
+        <div class="hide" id="ol-wait">
+          <div class="wait-wrap"><div class="wait-ring"></div><span class="wait-crown">♔</span></div>
+          <p class="wait-msg">Waiting for opponent</p>
+          <div class="share-row">
+            <span class="share-code" id="share-code">------</span>
+            <button class="btn-cp" onclick="App.copyCode()">Copy</button>
+          </div>
+          <button class="btn ghost sm" onclick="App.cancelWait()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Lichess block -->
+      <div class="blk hide" id="blk-lichess">
+        <div id="li-noauth">
+          <p class="li-info">Connect your Lichess account to play online against real players.</p>
+          <button class="btn gold full" onclick="App.lichessAuth()">Connect to Lichess</button>
+          <div class="sep"><span>or paste token</span></div>
+          <div class="row-join">
+            <input class="inp glass" id="li-token" placeholder="Access token" spellcheck="false">
+            <button class="btn gold" onclick="App.lichessSetToken()">Set</button>
+          </div>
+        </div>
+        <div class="hide" id="li-authed">
+          <p class="li-user">Connected as <strong id="li-name">-</strong></p>
+          <button class="btn gold full" onclick="App.lichessSeek()">Find Opponent</button>
+          <button class="btn ghost sm full" onclick="App.lichessDisconnect()">Disconnect</button>
+        </div>
+        <div class="hide" id="li-seeking">
+          <div class="wait-wrap"><div class="wait-ring"></div><span class="wait-crown">♔</span></div>
+          <p class="wait-msg">Seeking opponent on Lichess...</p>
+          <button class="btn ghost sm" onclick="App.lichessCancelSeek()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Time -->
+      <div class="blk">
+        <div class="blk-label">Time</div>
+        <div class="tc-grid">
+          <button class="tc on" data-t="60" data-i="0">1m</button>
+          <button class="tc" data-t="180" data-i="0">3m</button>
+          <button class="tc" data-t="300" data-i="0">5m</button>
+          <button class="tc" data-t="600" data-i="0">10m</button>
+          <button class="tc" data-t="900" data-i="10">15|10</button>
+          <button class="tc" data-t="0" data-i="0">∞</button>
+        </div>
+      </div>
+
+      <!-- Moves -->
+      <div class="blk blk-moves">
+        <div class="blk-label">Moves</div>
+        <div class="moves" id="moves"></div>
+      </div>
+
+      <!-- Move nav -->
+      <div class="mnav">
+        <button class="mn" onclick="App.navStart()">⟨⟨</button>
+        <button class="mn" onclick="App.navBack()">‹</button>
+        <button class="mn" onclick="App.navFwd()">›</button>
+        <button class="mn" onclick="App.navEnd()">⟩⟩</button>
+      </div>
+
+      <!-- Actions -->
+      <div class="acts">
+        <button class="btn glass" onclick="App.flip()">⇅ Flip</button>
+        <button class="btn dng" onclick="App.resign()">Resign</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Overlays -->
+  <div id="ov-gameover" class="ov">
+    <div class="modal glass">
+      <div class="go-crown" id="go-icon">♔</div>
+      <h2 id="go-title">Checkmate</h2>
+      <p class="go-sub" id="go-msg">White wins</p>
+      <button class="btn gold" onclick="App.newGame();App.closeOv('ov-gameover')">New Game</button>
+    </div>
+  </div>
+
+  <div id="ov-promo" class="ov">
+    <div class="modal glass promo-modal">
+      <h3>Promote to</h3>
+      <div class="promo-row" id="promo-row"></div>
+    </div>
+  </div>
+
+  <div id="toast-box"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script type="importmap">{"imports":{"chessground":"https://cdn.jsdelivr.net/npm/chessground@9.1.1/+esm"}}</script>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
